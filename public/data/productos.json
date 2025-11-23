@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "nombre": "Pulled pork ahumado",
+    "descripcion": "Cerdo ahumado lentamente con mezcla especial de especias.",
+    "precio": 12.5,
+    "imagen": "/images/product1.jpg",
+    "disponible": true,
+    "categoria": "Carnes"
+  },
+  {
+    "id": 2,
+    "nombre": "Salm\u00f3n ahumado premium",
+    "descripcion": "Salm\u00f3n fresco ahumado en madera de manzano.",
+    "precio": 18.0,
+    "imagen": "/images/product2.jpg",
+    "disponible": true,
+    "categoria": "Mariscos"
+  },
+  {
+    "id": 3,
+    "nombre": "Queso ahumado",
+    "descripcion": "Queso artesanal con aroma y sabor ahumado.",
+    "precio": 8.75,
+    "imagen": "/images/product3.jpg",
+    "disponible": false,
+    "categoria": "L\u00e1cteos"
+  },
+  {
+    "id": 4,
+    "nombre": "Chorizo ahumado casero",
+    "descripcion": "Hecho con receta familiar y ahumado a le\u00f1a.",
+    "precio": 6.0,
+    "imagen": "/images/product4.jpg",
+    "disponible": true,
+    "categoria": "Embutidos"
+  }
+]
