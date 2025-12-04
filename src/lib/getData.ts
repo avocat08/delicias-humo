@@ -46,6 +46,19 @@ export async function buscarPedidoPorCodigo(codigo: string){
     return null
   }
 }
+
+export async function getOrders() {
+  try{
+    const res = await fetch(`${API_BASE}/orders/get_orders.php`, {
+      headers: fetchHeaders
+    })
+    if(!res.ok) throw new Error('No se pudieron cargar los pedidos')
+    return await res.json()
+  }catch(e){
+    console.error('getOrders error', e)
+    return []
+  }
+}
 export async function crearPedido(pedidoData: {
   nombre: string
   correo: string
