@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 
 export default function ProductDetail({ product }: { product: any }){
@@ -16,15 +17,14 @@ export default function ProductDetail({ product }: { product: any }){
       <aside className="card p-6">
         <div className="flex items-center justify-between">
           <div className="text-sm text-gray-400">Precio</div>
-          <div className="text-xl font-bold text-brand">${product.precio.toFixed(2)}</div>
+          <div className="text-xl font-bold text-brand">${Number(product.precio).toFixed(2)}</div>
         </div>
         <div className="mt-4">
           <label className="text-gray-300">Cantidad</label>
           <input type="number" min={1} value={cantidad} onChange={(e)=>setCantidad(Number(e.target.value))} className="w-full mt-2 p-2 rounded-md bg-black border border-gray-800" />
         </div>
         <div className="mt-6 flex gap-3">
-          <button className="btn-brand">Pedir (simular)</button>
-          <button className="btn-outline">Agregar al carrito</button>
+          <Link href={`/checkout?producto_id=${product.id}&cantidad=${cantidad}`} className="btn-brand">Pedir</Link>
         </div>
       </aside>
     </div>
