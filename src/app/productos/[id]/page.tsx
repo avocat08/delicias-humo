@@ -1,11 +1,12 @@
-'use client'
+// @ts-nocheck
+"use client"
 import { use, useEffect, useState } from 'react'
 import { getProducto } from '../../../lib/getData'
 import ProductDetail from '../../../components/ProductDetail'
 
 export default function ProductoPage({ params }: any){
   const { id } = use(params)
-  const [producto, setProducto] = useState(null)
+  const [producto, setProducto] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(()=>{

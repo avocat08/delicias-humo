@@ -33,7 +33,9 @@ export default function Home(){
           </div>
           <div className="flex-1">
             <div className="card h-64 flex items-center justify-center">
-              <img src="/images/product1.jpg" alt="hero" className="h-full object-cover rounded-md" />
+              <video src="/videos/hero.mp4" autoPlay muted loop playsInline className="h-full object-cover rounded-md">
+                Tu navegador no soporta video.
+              </video>
             </div>
           </div>
         </section>
@@ -59,7 +61,9 @@ export default function Home(){
         </div>
         <div className="flex-1">
           <div className="card h-64 flex items-center justify-center">
-            <img src="/images/product1.jpg" alt="hero" className="h-full object-cover rounded-md" />
+            <video src="/images/video1.mp4" autoPlay muted loop playsInline className="h-full object-cover rounded-md" style={{transform: 'rotate(-90deg)', transformOrigin: 'center', width: '50%' ,height: 'auto'}}>
+              Tu navegador no soporta video. 
+            </video>
           </div>
         </div>
       </section>

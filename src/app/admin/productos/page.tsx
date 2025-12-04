@@ -21,6 +21,7 @@ const fetchHeaders = {
 export default function AdminProductos(){
   const [productos, setProductos] = useState<Producto[]>([])
   const [showEditModal, setShowEditModal] = useState(false)
+  const [showCreateModal, setShowCreateModal] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Producto | null>(null)
   const [formData, setFormData] = useState({
     nombre: '',
@@ -59,6 +60,12 @@ export default function AdminProductos(){
       imagen: null
     })
     setShowEditModal(true)
+  }
+
+  const handleCreateClick = () => {
+    // reset form for create
+    setFormData({ nombre: '', descripcion: '', precio: '', disponible: 1, imagen: null })
+    setShowCreateModal(true)
   }
 
   const handleDeleteClick = async (productId: number) => {
@@ -139,9 +146,49 @@ export default function AdminProductos(){
     }
   }
 
+  const handleCreateProduct = async (e: React.FormEvent) => {
+    e.preventDefault()
+    try {
+      setLoading(true)
+      const toSend = new FormData()
+      toSend.append('nombre', formData.nombre)
+      toSend.append('descripcion', formData.descripcion)
+      toSend.append('precio', formData.precio)
+      toSend.append('disponible', formData.disponible.toString())
+      if (formData.imagen) toSend.append('imagen', formData.imagen)
+
+      const res = await fetch(`${API_BASE}/products/create_product.php`, {
+        method: 'POST',
+        headers: fetchHeaders,
+        body: toSend
+      })
+      const data = await res.json()
+      if (data.success) {
+        await loadProductos()
+        setShowCreateModal(false)
+        alert('Producto creado correctamente')
+      } else {
+        alert('Error al crear: ' + (data.message || JSON.stringify(data)))
+      }
+    } catch (err) {
+      console.error('create product error', err)
+      alert('Error al crear el producto')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div className="container py-8">
-      <h1 className="text-2xl font-semibold mb-4">Panel - Productos</h1>
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-2xl font-semibold">Panel - Productos</h1>
+        <button
+          onClick={handleCreateClick}
+          className="bg-amber-400 hover:bg-amber-500 text-black font-medium py-2 px-4 rounded-md shadow"
+        >
+          Crear producto
+        </button>
+      </div>
       <div className="grid grid-cols-1 gap-4">
         {listLoading ? (
           <div className="text-sm text-gray-400">Cargando productos...</div>
@@ -183,8 +230,8 @@ export default function AdminProductos(){
       {/* Edit Modal */}
       {showEditModal && editingProduct && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-900 rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
-            <h2 className="text-xl font-semibold mb-4">Editar Producto</h2>
+          <div className="bg-black rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto border border-amber-400">
+            <h2 className="text-xl font-semibold mb-4 text-amber-400">Editar Producto</h2>
             <form onSubmit={handleUpdateProduct} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium mb-1">Nombre</label>
@@ -193,7 +240,7 @@ export default function AdminProductos(){
                   name="nombre"
                   value={formData.nombre}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:border-orange-500"
+                  className="w-full px-3 py-2 bg-black border border-amber-400 rounded-md text-white focus:outline-none focus:border-amber-300"
                   required
                 />
               </div>
@@ -205,7 +252,7 @@ export default function AdminProductos(){
                   value={formData.descripcion}
                   onChange={handleInputChange}
                   rows={3}
-                  className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:border-orange-500 resize-none"
+                  className="w-full px-3 py-2 bg-black border border-amber-400 rounded-md text-white focus:outline-none focus:border-amber-300 resize-none"
                   required
                 />
               </div>
@@ -219,7 +266,7 @@ export default function AdminProductos(){
                     value={formData.precio}
                     onChange={handleInputChange}
                     step="0.01"
-                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:border-orange-500"
+                    className="w-full px-3 py-2 bg-black border border-amber-400 rounded-md text-white focus:outline-none focus:border-amber-300"
                     required
                   />
                 </div>
@@ -229,7 +276,7 @@ export default function AdminProductos(){
                     name="disponible"
                     value={formData.disponible}
                     onChange={(e) => setFormData({ ...formData, disponible: parseInt(e.target.value) })}
-                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:border-orange-500"
+                    className="w-full px-3 py-2 bg-black border border-amber-400 rounded-md text-white focus:outline-none focus:border-amber-300"
                   >
                     <option value={1}>Sí</option>
                     <option value={0}>No</option>
@@ -251,7 +298,7 @@ export default function AdminProductos(){
                   name="imagen"
                   onChange={handleImageChange}
                   accept="image/*"
-                  className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-orange-600 file:text-white hover:file:bg-orange-700"
+                  className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border file:border-gray-200 file:bg-white file:text-black hover:file:bg-gray-100"
                 />
                 <p className="text-xs text-gray-400 mt-1">Déjalo vacío para mantener la imagen actual</p>
               </div>
@@ -260,13 +307,104 @@ export default function AdminProductos(){
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 bg-orange-600 hover:bg-orange-700 text-white font-medium py-2 rounded-md disabled:opacity-50"
+                  className="flex-1 bg-amber-400 hover:bg-amber-500 text-black font-medium py-2 rounded-md disabled:opacity-50"
                 >
                   {loading ? 'Guardando...' : 'Guardar Cambios'}
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowEditModal(false)}
+                  disabled={loading}
+                  className="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-medium py-2 rounded-md disabled:opacity-50"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Create Modal */}
+      {showCreateModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-black rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto border border-amber-400">
+            <h2 className="text-xl font-semibold mb-4 text-amber-400">Crear Producto</h2>
+            <form onSubmit={handleCreateProduct} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Nombre</label>
+                <input
+                  type="text"
+                  name="nombre"
+                  value={formData.nombre}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 bg-black border border-amber-400 rounded-md text-white focus:outline-none focus:border-amber-300"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">Descripción</label>
+                <textarea
+                  name="descripcion"
+                  value={formData.descripcion}
+                  onChange={handleInputChange}
+                  rows={3}
+                  className="w-full px-3 py-2 bg-black border border-amber-400 rounded-md text-white focus:outline-none focus:border-amber-300 resize-none"
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Precio</label>
+                  <input
+                    type="number"
+                    name="precio"
+                    value={formData.precio}
+                    onChange={handleInputChange}
+                    step="0.01"
+                    className="w-full px-3 py-2 bg-black border border-amber-400 rounded-md text-white focus:outline-none focus:border-amber-300"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Disponible</label>
+                  <select
+                    name="disponible"
+                    value={formData.disponible}
+                    onChange={(e) => setFormData({ ...formData, disponible: parseInt(e.target.value) })}
+                    className="w-full px-3 py-2 bg-black border border-amber-400 rounded-md text-white focus:outline-none focus:border-amber-300"
+                  >
+                    <option value={1}>Sí</option>
+                    <option value={0}>No</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">Imagen</label>
+                <input
+                  type="file"
+                  name="imagen"
+                  onChange={handleImageChange}
+                  accept="image/*"
+                  className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border file:border-gray-200 file:bg-white file:text-black hover:file:bg-gray-100"
+                />
+                <p className="text-xs text-gray-400 mt-1">Opcional</p>
+              </div>
+
+              <div className="flex gap-2 pt-4">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex-1 bg-amber-400 hover:bg-amber-500 text-black font-medium py-2 rounded-md disabled:opacity-50"
+                >
+                  {loading ? 'Creando...' : 'Crear Producto'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowCreateModal(false)}
                   disabled={loading}
                   className="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-medium py-2 rounded-md disabled:opacity-50"
                 >

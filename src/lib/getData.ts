@@ -4,13 +4,29 @@ const fetchHeaders = {
   'ngrok-skip-browser-warning': 'true'
 }
 
+// Base URL to use for images. Prefer explicit env var if provided,
+// otherwise derive from `API_BASE` by removing the trailing `/api` segment.
+const BACKEND_BASE = (process.env.NEXT_PUBLIC_BACKEND_BASE as string) || API_BASE.replace(/\/api\/?$/, '')
+
+function resolveImagePath(img: string | null | undefined) {
+  if (!img) return img
+  // already absolute
+  if (/^https?:\/\//i.test(img)) return img
+  // build URL using BACKEND_BASE
+  return `${BACKEND_BASE.replace(/\/$/, '')}/${String(img).replace(/^\/+/, '')}`
+}
+
 export async function getProductos() {
   try{
     const res = await fetch(`${API_BASE}/products/get_products.php`, {
       headers: fetchHeaders
     })
     if(!res.ok) throw new Error('No se pudieron cargar los productos')
-    return res.json()
+    const data = await res.json()
+    if (Array.isArray(data)) {
+      return data.map((p:any) => ({ ...p, imagen: resolveImagePath(p.imagen) }))
+    }
+    return data
   }catch(e){
     console.error('getProductos error', e)
     return []
@@ -25,6 +41,12 @@ export async function getProducto(id: string | number) {
     })
     if (!res.ok) return null
     const data = await res.json()
+    if (data) {
+      if (data.imagen) data.imagen = resolveImagePath(data.imagen)
+      if (Array.isArray(data.items)) {
+        data.items = data.items.map((it:any) => ({ ...it, imagen: resolveImagePath(it.imagen) }))
+      }
+    }
     return data
   }catch(e){
     console.error('getProducto error', e)
@@ -53,7 +75,18 @@ export async function getOrders() {
       headers: fetchHeaders
     })
     if(!res.ok) throw new Error('No se pudieron cargar los pedidos')
-    return await res.json()
+    const data = await res.json()
+    if (Array.isArray(data)) {
+      return data.map((o:any) => {
+        if (Array.isArray(o.items)) {
+          o.items = o.items.map((it:any) => ({ ...it, imagen: resolveImagePath(it.imagen) }))
+        }
+        // if the order itself has an image field
+        if (o.imagen) o.imagen = resolveImagePath(o.imagen)
+        return o
+      })
+    }
+    return data
   }catch(e){
     console.error('getOrders error', e)
     return []
