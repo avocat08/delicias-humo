@@ -1,33 +1,41 @@
-// @ts-nocheck
 'use client'
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { getProducto, crearPedido } from '../../lib/getData'
 
-export default function CheckoutPage(){
+export default function CheckoutPage() {
   const searchParams = useSearchParams()
-  const producto_id = searchParams?.get('producto_id')
-  const cantidadParam = searchParams?.get('cantidad') || '1'
-
-  const [cantidad, setCantidad] = useState(Number(cantidadParam))
+  
+  // Valores iniciales seguros
+  const [productoId, setProductoId] = useState<string | null>(null)
+  const [cantidad, setCantidad] = useState<number>(1)
+  
   const [producto, setProducto] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [result, setResult] = useState<any>(null)
   const [form, setForm] = useState({nombre:'', correo:'', telefono:'', direccion:'', comentarios:''})
 
-  useEffect(()=>{
-    if(!producto_id){
+  // Extraemos params solo en useEffect (evita error de prerender)
+  useEffect(() => {
+    const id = searchParams?.get('producto_id')
+    const cant = searchParams?.get('cantidad') || '1'
+    setProductoId(id)
+    setCantidad(Number(cant))
+  }, [searchParams])
+
+  useEffect(() => {
+    if (!productoId) {
       setLoading(false)
       return
     }
-    getProducto(producto_id).then((p:any)=>{
+    getProducto(productoId).then((p: any) => {
       setProducto(p)
       setLoading(false)
     })
-  },[producto_id])
+  }, [productoId])
 
-  async function handleSubmit(e:any){
+  async function handleSubmit(e: any) {
     e.preventDefault()
     if(!form.nombre || !form.correo){
       alert('Nombre y correo son obligatorios')
@@ -44,7 +52,7 @@ export default function CheckoutPage(){
       telefono: form.telefono,
       direccion: form.direccion,
       comentarios: form.comentarios,
-      items: [ { producto_id: Number(producto.id), cantidad: Number(cantidad) } ]
+      items: [{ producto_id: Number(producto.id), cantidad }]
     }
 
     const res = await crearPedido(payload)
