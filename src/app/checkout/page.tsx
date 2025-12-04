@@ -4,25 +4,22 @@ import { useSearchParams } from 'next/navigation'
 import { getProducto, crearPedido } from '../../lib/getData'
 
 export default function CheckoutPage() {
-  const searchParams = useSearchParams()
-  
-  // Valores iniciales seguros
   const [productoId, setProductoId] = useState<string | null>(null)
   const [cantidad, setCantidad] = useState<number>(1)
-  
   const [producto, setProducto] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [result, setResult] = useState<any>(null)
   const [form, setForm] = useState({nombre:'', correo:'', telefono:'', direccion:'', comentarios:''})
 
-  // Extraemos params solo en useEffect (evita error de prerender)
   useEffect(() => {
-    const id = searchParams?.get('producto_id')
-    const cant = searchParams?.get('cantidad') || '1'
+    // Esto se ejecuta solo en el cliente, evitando el error de prerender
+    const searchParams = new URLSearchParams(window.location.search)
+    const id = searchParams.get('producto_id')
+    const cant = searchParams.get('cantidad') || '1'
     setProductoId(id)
     setCantidad(Number(cant))
-  }, [searchParams])
+  }, [])
 
   useEffect(() => {
     if (!productoId) {
