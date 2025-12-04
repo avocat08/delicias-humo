@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Tester Backend - Delicias con Humo</title>
+</head>
+<body>
+    <h1>Panel de pruebas Backend 🔧</h1>
+    <hr>
+
+    <!-- RESULTADOS -->
+    <h3>Respuesta:</h3>
+    <pre id="responseBox" style="background:#f3f3f3;padding:10px;border:1px solid #ccc;"></pre>
+
+    <script>
+        async function sendForm(form, endpoint) {
+            const box = document.getElementById("responseBox");
+            const data = new FormData(form);
+
+            const res = await fetch(endpoint, {
+                method: "POST",
+                body: data
+            });
+
+            box.textContent = await res.text();
+        }
+
+        async function sendGet(endpoint) {
+            const box = document.getElementById("responseBox");
+            const res = await fetch(endpoint);
+            box.textContent = await res.text();
+        }
+    </script>
+
+    <hr>
+
+    <!-- CREATE PRODUCT -->
+    <h2>Crear producto</h2>
+    <form onsubmit="sendForm(this, './products/create_product.php'); return false;">
+        Nombre: <input name="nombre"><br>
+        Descripción: <input name="descripcion"><br>
+        Precio: <input name="precio" type="number" step="0.01"><br>
+        Disponible: <select name="disponible">
+            <option value="1">Sí</option>
+            <option value="0">No</option>
+        </select><br>
+        Imagen: <input type="file" name="imagen"><br><br>
+        <button>Crear</button>
+    </form>
+    <hr>
+
+    <!-- GET PRODUCTS -->
+    <h2>Listar productos</h2>
+    <button onclick="sendGet('./products/get_products.php')">Mostrar productos</button>
+    <hr>
+
+    <!-- GET PRODUCT -->
+    <h2>Ver producto por ID</h2>
+    <form onsubmit="event.preventDefault(); sendGet('./products/get_product.php?id=' + this.id.value);">
+        ID producto: <input name="id"><br><br>
+        <button>Ver</button>
+    </form>
+    <hr>
+
+    <!-- UPDATE PRODUCT -->
+    <h2>Actualizar producto</h2>
+    <form onsubmit="sendForm(this, './products/update_product.php'); return false;">
+        ID producto: <input name="id"><br>
+        Nombre: <input name="nombre"><br>
+        Descripción: <input name="descripcion"><br>
+        Precio: <input name="precio" type="number"><br>
+        Disponible: <select name="disponible">
+            <option value="1">Sí</option>
+            <option value="0">No</option>
+        </select><br>
+        Nueva imagen (opcional): <input type="file" name="imagen"><br><br>
+        <button>Actualizar</button>
+    </form>
+    <hr>
+
+    <!-- DELETE PRODUCT -->
+    <h2>Eliminar producto</h2>
+    <form onsubmit="event.preventDefault(); sendGet('./products/delete_product.php?id=' + this.id.value);">
+        ID producto: <input name="id"><br><br>
+        <button>Eliminar</button>
+    </form>
+    <hr>
+
+    <!-- CREATE ORDER -->
+    <h2>Crear pedido</h2>
+    <form onsubmit="sendForm(this, './orders/create_order.php'); return false;">
+        Nombre: <input name="nombre"><br>
+        Correo: <input name="email"><br>
+        Teléfono: <input name="telefono"><br>
+        Dirección: <input name="direccion"><br>
+        Comentarios: <input name="comentarios"><br>
+        Productos (JSON): <input name="productos"><br><br>
+        <button>Crear pedido</button>
+    </form>
+    <hr>
+
+    <!-- GET ORDER -->
+    <h2>Consultar pedido</h2>
+    <form onsubmit="event.preventDefault(); sendGet('./orders/get_order_by_code.php?codigo=' + this.codigo.value);">
+        Código pedido: <input name="codigo"><br><br>
+        <button>Consultar</button>
+    </form>
+    <hr>
+
+    <!-- GET ORDERS -->
+    <h2>Listar todos los pedidos</h2>
+    <button onclick="sendGet('./orders/get_orders.php')">Mostrar pedidos</button>
+    <hr>
+
+    <!-- UPDATE STATUS -->
+    <h2>Actualizar estado de pedido</h2>
+    <form onsubmit="sendForm(this, './orders/update_order_state.php'); return false;">
+        Código pedido: <input name="codigo"><br>
+        Nuevo estado: <input name="estado"><br><br>
+        <button>Actualizar</button>
+    </form>
+    <hr>
+
+    <!-- GET CLIENT -->
+    <h2>Consultar cliente frecuente</h2>
+    <form onsubmit="event.preventDefault(); sendGet('./clients/get_clients.php?email=' + this.email.value);">
+        Correo: <input name="email"><br><br>
+        <button>Consultar</button>
+    </form>
+
+    <hr><br><br>
+</body>
+</html>
