@@ -28,7 +28,7 @@ export default function ProductCard({ product }: { product: any }) {
 
       <div className="mt-4 flex items-center justify-between">
         <span className="font-bold text-brand">
-          ${product.precio.toFixed(2)}
+          ${Number(product.precio).toFixed(2)}
         </span>
 
         <Link 
