@@ -24,7 +24,6 @@ pnpm-debug.log*
 logs/
 *.log
 
-api/
 
 # Testing
 /coverage/
