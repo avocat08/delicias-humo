@@ -14,7 +14,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body>
+      <body suppressHydrationWarning>
         <header className="border-b border-gray-800">
           <div className="container flex items-center justify-between py-4">
             <Link href="/" className="flex items-center gap-3">
@@ -33,7 +33,7 @@ export default function RootLayout({
               <Link href="/productos">Catálogo</Link>
               <Link href="/rastreo">Rastreo</Link>
               <Link href="/contacto">Contacto</Link>
-              <Link href="/admin/productos" className="ml-4">
+              <Link href="/admin/login" className="ml-4">
                 <button className="btn-outline">Panel</button>
               </Link>
             </nav>

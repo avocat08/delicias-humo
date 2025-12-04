@@ -6,7 +6,45 @@ import ProductGrid from '../components/ProductGrid'
 
 export default function Home(){
   const [productos, setProductos] = useState([])
-  useEffect(()=>{getProductos().then((d)=>setProductos(d))},[])
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(()=>{
+    setMounted(true)
+    getProductos().then((d)=>{
+      if(d && d.length > 0){
+        const shuffled = [...d].sort(() => Math.random() - 0.5)
+        setProductos(shuffled.slice(0, 3))
+      }
+    })
+  },[])
+
+  // Evitar renderizar hasta que el cliente esté montado
+  if (!mounted) {
+    return (
+      <div>
+        <section className="container py-12 flex flex-col md:flex-row items-center gap-8">
+          <div className="flex-1">
+            <h1 className="text-4xl font-bold text-white">Delicias con Humo</h1>
+            <p className="mt-4 text-gray-300 max-w-lg">Productos ahumados artesanales, elaborados con técnicas tradicionales y maderas seleccionadas. Pide para tu evento o disfruta en casa.</p>
+            <div className="mt-6 flex gap-4">
+              <Link href="/productos" className="btn-brand">Ver catálogo</Link>
+              <Link href="/contacto" className="btn-outline">Contacto</Link>
+            </div>
+          </div>
+          <div className="flex-1">
+            <div className="card h-64 flex items-center justify-center">
+              <img src="/images/product1.jpg" alt="hero" className="h-full object-cover rounded-md" />
+            </div>
+          </div>
+        </section>
+
+        <section className="container py-8">
+          <h2 className="text-2xl font-semibold mb-4">Productos destacados</h2>
+          <div className="text-gray-400">Cargando productos...</div>
+        </section>
+      </div>
+    )
+  }
 
   return (
     <div>
@@ -28,7 +66,7 @@ export default function Home(){
 
       <section className="container py-8">
         <h2 className="text-2xl font-semibold mb-4">Productos destacados</h2>
-        <ProductGrid products={productos.slice(0,3)} />
+        <ProductGrid products={productos} />
       </section>
     </div>
   )

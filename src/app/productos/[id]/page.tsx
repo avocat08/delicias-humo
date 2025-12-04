@@ -1,20 +1,22 @@
 'use client'
-import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
-import { getProductos } from '../../../lib/getData'
+import { use, useEffect, useState } from 'react'
+import { getProducto } from '../../../lib/getData'
 import ProductDetail from '../../../components/ProductDetail'
 
 export default function ProductoPage({ params }: any){
-  const { id } = params
+  const { id } = use(params)
   const [producto, setProducto] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(()=>{
-    getProductos().then((list:any)=>{
-      const p = list.find((x:any)=>String(x.id) === String(id))
+    if(!id) return
+    getProducto(id).then((p:any)=>{
       setProducto(p)
+      setLoading(false)
     })
   },[id])
 
+  if(loading) return <div className="container py-8">Cargando...</div>
   if(!producto) return <div className="container py-8">Producto no encontrado</div>
 
   return (
